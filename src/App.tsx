@@ -36,7 +36,7 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  Paper,
+  
   createTheme,
   ThemeProvider,
   CssBaseline,
@@ -61,7 +61,7 @@ import {
 import SortIcon from '@mui/icons-material/Sort';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import GitHubIcon from '@mui/icons-material/GitHub';
+
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -131,6 +131,85 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>(SortMode.None);
   const [currentSortingGroupId, setCurrentSortingGroupId] = useState<number | null>(null);
+  
+  // 新增层级导航状态
+  const [selectedMainCategory, setSelectedMainCategory] = useState<number | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<number | null>(null);
+  
+  // 分离大分类和小分类
+  const mainCategories = useMemo(() => {
+    return groups.filter(group => !group.parent_id);
+  }, [groups]);
+  
+  // 获取当前选中大分类下的小分类
+  const subCategories = useMemo(() => {
+    if (!selectedMainCategory) return [];
+    return groups.filter(group => group.parent_id === selectedMainCategory);
+  }, [groups, selectedMainCategory]);
+  
+  // 不再自动选择第一个大类，让用户能够看到所有顶级分类
+  // useEffect(() => {
+  //   if (mainCategories.length > 0 && !selectedMainCategory) {
+  //     setSelectedMainCategory(mainCategories[0].id);
+  //   }
+  // }, [mainCategories, selectedMainCategory, setSelectedMainCategory]);
+  
+  // 构建分组的层级结构
+  const hierarchicalGroups = useMemo(() => {
+    // 创建一个映射，方便查找分组
+    const groupMap = new Map<number, GroupWithSites>();
+    
+    // 先创建所有分组对象
+    const allGroupsWithSites = groups.map(group => ({
+      ...group,
+      id: group.id as number,
+      sites: (group as any).sites || [],
+      subgroups: []
+    }));
+    
+    // 将所有分组添加到映射
+    allGroupsWithSites.forEach(group => {
+      groupMap.set(group.id, group);
+    });
+    
+    // 构建层级关系
+    const rootGroups: GroupWithSites[] = [];
+    allGroupsWithSites.forEach(group => {
+      if (group.parent_id === null || group.parent_id === undefined) {
+        // 顶级分组
+        rootGroups.push(group);
+      } else {
+        // 子分组
+        const parent = groupMap.get(group.parent_id as number);
+        if (parent) {
+          parent.subgroups?.push(group);
+        }
+      }
+    });
+    
+    return rootGroups;
+  }, [groups]);
+  
+  // 获取当前需要显示的分组（如果有选中的小分类则只显示该小分类，否则显示大分类下的所有小分类以及大分类本身）
+  const visibleGroups = useMemo(() => {
+    // 始终显示所有顶级分类
+    if (selectedSubCategory) {
+      // 当选择子分类时，显示所有顶级分类
+      return groups.filter(group => !group.parent_id);
+    } else if (selectedMainCategory) {
+      // 显示主分类本身以及它的子分类
+      return groups.filter(group => 
+        group.id === selectedMainCategory || group.parent_id === selectedMainCategory
+      );
+    }
+    return groups;
+  }, [groups, selectedMainCategory, selectedSubCategory]);
+  
+  // 获取当前需要显示的层级分组
+  const visibleHierarchicalGroups = useMemo(() => {
+    // 始终显示所有顶级分组
+    return hierarchicalGroups;
+  }, [hierarchicalGroups]);
 
   // 新增认证状态
   const [isAuthChecking, setIsAuthChecking] = useState(true);
@@ -174,6 +253,7 @@ function App() {
     name: '',
     order_num: 0,
     is_public: 1, // 默认为公开
+    parent_id: null, // 默认作为大类
   });
   const [newSite, setNewSite] = useState<Partial<Site>>({
     name: '',
@@ -343,6 +423,17 @@ function App() {
       console.error('加载配置失败:', error);
       // 使用默认配置
     }
+  };
+  
+  // 处理大分类选择
+  const handleMainCategorySelect = (categoryId: number) => {
+    setSelectedMainCategory(categoryId);
+    setSelectedSubCategory(null); // 重置小分类选择
+  };
+  
+  // 处理小分类选择
+  const handleSubCategorySelect = (categoryId: number) => {
+    setSelectedSubCategory(categoryId);
   };
 
   useEffect(() => {
@@ -546,9 +637,15 @@ function App() {
     }
   };
 
-  // 新增分组相关函数
+  // 新增分类相关函数
+  const [rootCategoryText, setRootCategoryText] = useState('/');
+  
+  // 当前选中的子分类ID
+
+  
   const handleOpenAddGroup = () => {
     setNewGroup({ name: '', order_num: groups.length, is_public: 1 }); // 默认公开
+    setRootCategoryText('/'); // 重置根分类显示文本为"/"
     setOpenAddGroup(true);
   };
 
@@ -556,11 +653,15 @@ function App() {
     setOpenAddGroup(false);
   };
 
-  const handleGroupInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGroupInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
     setNewGroup({
       ...newGroup,
-      [e.target.name]: e.target.value,
+      [name]: name === 'parent_id' ? (value === 'null' ? null : parseInt(value, 10)) : value,
     });
+    
+    // 始终显示"/"作为根分类标识，不随输入变化
   };
 
   const handleCreateGroup = async () => {
@@ -582,7 +683,10 @@ function App() {
 
   // 新增站点相关函数
   const handleOpenAddSite = (groupId: number) => {
-    const group = groups.find((g) => g.id === groupId);
+    // 如果有选中的子分类，则使用子分类ID作为group_id
+    const targetGroupId = selectedSubCategory || groupId;
+    
+    const group = groups.find((g) => g.id === targetGroupId);
     const maxOrderNum = group?.sites.length
       ? Math.max(...group.sites.map((s) => s.order_num)) + 1
       : 0;
@@ -593,7 +697,7 @@ function App() {
       icon: '',
       description: '',
       notes: '',
-      group_id: groupId,
+      group_id: targetGroupId,
       order_num: maxOrderNum,
       is_public: 1, // 默认为公开
     });
@@ -682,6 +786,7 @@ function App() {
           id: group.id,
           name: group.name,
           order_num: group.order_num,
+          parent_id: group.parent_id,
         })),
         // 站点数据作为单独的顶级数组
         sites: allSites,
@@ -943,7 +1048,7 @@ function App() {
           <>
             <Box
               sx={{
-                position: 'absolute',
+                position: 'fixed',
                 top: 0,
                 left: 0,
                 right: 0,
@@ -1074,7 +1179,7 @@ function App() {
                           fontSize: { xs: '0.75rem', sm: '0.875rem' },
                         }}
                       >
-                        新增分组
+                        新增分类
                       </Button>
 
                       <Button
@@ -1204,62 +1309,154 @@ function App() {
           )}
 
           {!loading && !error && (
-            <Box
-              sx={{
-                '& > *': { mb: 5 },
-                minHeight: '100px',
-              }}
-            >
-              {sortMode === SortMode.GroupSort ? (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={groups.map((group) => group.id.toString())}
-                    strategy={verticalListSortingStrategy}
+            <Box sx={{ minHeight: '100px' }}>
+              {/* 大分类导航栏 - 暂时隐藏 */}
+              {/* {mainCategories.length > 0 && (
+                <Box sx={{ mb: 4, overflowX: 'auto', pb: 1 }}>
+                  <Stack direction='row' spacing={2} sx={{ minWidth: 'max-content' }}>
+                    {mainCategories.map((category) => (
+                      <Button
+                        key={`main-${category.id}`}
+                        variant={selectedMainCategory === category.id ? 'contained' : 'outlined'}
+                        size='large'
+                        onClick={() => handleMainCategorySelect(category.id)}
+                        sx={{
+                          px: 4,
+                          py: 1.5,
+                          borderRadius: 3,
+                          textTransform: 'none',
+                          fontSize: '1rem',
+                          fontWeight: 500,
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        {category.name}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+              
+              {/* 小分类横向滑动标签栏 */}
+              {selectedMainCategory && subCategories.length > 0 && (
+                <Box sx={{ mb: 5, overflowX: 'auto', pb: 2 }}>
+                  <Stack 
+                    direction='row' 
+                    spacing={1} 
+                    sx={{ 
+                      minWidth: 'max-content',
+                      pb: 1,
+                      '&::-webkit-scrollbar': {
+                        height: 6,
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                      },
+                    }}
                   >
-                    <Stack
-                      spacing={2}
+                    <Button
+                      variant={!selectedSubCategory ? 'contained' : 'outlined'}
+                      onClick={() => setSelectedSubCategory(null)}
                       sx={{
-                        '& > *': {
-                          transition: 'none',
-                        },
+                        px: 3,
+                        py: 1,
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
                       }}
                     >
-                      {groups.map((group) => (
-                        <SortableGroupItem key={group.id} id={group.id.toString()} group={group} />
-                      ))}
-                    </Stack>
-                  </SortableContext>
-                </DndContext>
-              ) : (
-                <Stack spacing={5}>
-                  {groups.map((group) => (
-                    <Box key={`group-${group.id}`} id={`group-${group.id}`}>
-                      <GroupCard
-                        group={group}
-                        sortMode={sortMode === SortMode.None ? 'None' : 'SiteSort'}
-                        currentSortingGroupId={currentSortingGroupId}
-                        viewMode={viewMode}
-                        onUpdate={handleSiteUpdate}
-                        onDelete={handleSiteDelete}
-                        onSaveSiteOrder={handleSaveSiteOrder}
-                        onStartSiteSort={startSiteSort}
-                        onAddSite={handleOpenAddSite}
-                        onUpdateGroup={handleGroupUpdate}
-                        onDeleteGroup={handleGroupDelete}
-                        configs={configs}
-                      />
-                    </Box>
-                  ))}
-                </Stack>
+                      全部
+                    </Button>
+                    {subCategories.map((category) => (
+                      <Button
+                        key={`sub-${category.id}`}
+                        variant={selectedSubCategory === category.id ? 'contained' : 'outlined'}
+                        onClick={() => handleSubCategorySelect(category.id)}
+                        sx={{
+                          px: 3,
+                          py: 1,
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {category.name}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Box>
               )}
+              
+              {/* 内容展示区域 */}
+              <Box sx={{ '& > *': { mb: 5 } }}>
+                {sortMode === SortMode.GroupSort ? (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={visibleGroups.map((group) => group.id.toString())}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <Stack
+                        spacing={2}
+                        sx={{
+                          '& > *': {
+                            transition: 'none',
+                          },
+                        }}
+                      >
+                        {visibleGroups.map((group) => (
+                          <SortableGroupItem key={group.id} id={group.id.toString()} group={group} />
+                        ))}
+                      </Stack>
+                    </SortableContext>
+                  </DndContext>
+                ) : (
+                  <Stack spacing={5}>
+                    {visibleHierarchicalGroups.map((group) => (
+                      <Box key={`group-${group.id}`} id={`group-${group.id}`}>
+                        <GroupCard
+                          group={group}
+                          sortMode={sortMode === SortMode.None ? 'None' : 'SiteSort'}
+                          currentSortingGroupId={currentSortingGroupId}
+                          viewMode={viewMode}
+                          onUpdate={handleSiteUpdate}
+                          onDelete={handleSiteDelete}
+                          onSaveSiteOrder={handleSaveSiteOrder}
+                          onStartSiteSort={startSiteSort}
+                          onAddSite={handleOpenAddSite}
+                          onUpdateGroup={handleGroupUpdate}
+                          onDeleteGroup={handleGroupDelete}
+                          configs={configs}
+                          mainCategories={mainCategories}
+                          onSubCategoryClick={(subgroupId) => {
+                            // 处理子分类点击事件
+                            console.log('Subcategory clicked:', subgroupId);
+                            setSelectedSubCategory(subgroupId);
+                          }}
+                          selectedSubCategory={selectedSubCategory}
+                        />
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+              </Box>
             </Box>
           )}
 
-          {/* 新增分组对话框 */}
+          {/* 新增分类对话框 */}
           <Dialog
             open={openAddGroup}
             onClose={handleCloseAddGroup}
@@ -1274,7 +1471,7 @@ function App() {
             }}
           >
             <DialogTitle>
-              新增分组
+              新增分类
               <IconButton
                 aria-label='close'
                 onClick={handleCloseAddGroup}
@@ -1302,6 +1499,28 @@ function App() {
                 onChange={handleGroupInputChange}
                 sx={{ mb: 2 }}
               />
+
+              {/* 父分类选择 */}
+              <TextField
+                  margin='dense'
+                  id='parent-id'
+                  name='parent_id'
+                  label='父分类'
+                  type='select'
+                  select
+                  fullWidth
+                  variant='outlined'
+                  value={newGroup.parent_id == null ? 'null' : newGroup.parent_id.toString()}
+                  onChange={handleGroupInputChange}
+                  sx={{ mb: 2 }}
+                >
+                <MenuItem value='null'>{rootCategoryText}</MenuItem>
+                {mainCategories.map((category) => (
+                  <MenuItem key={`parent-${category.id}`} value={category.id.toString()}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </TextField>
 
               {/* 公开/私密开关 */}
               <FormControlLabel
@@ -1368,6 +1587,48 @@ function App() {
             <DialogContent>
               <DialogContentText sx={{ mb: 2 }}>请输入新站点的信息</DialogContentText>
               <Stack spacing={2}>
+                {/* 分类选择 */}
+                <TextField
+                  margin='dense'
+                  id='site-group'
+                  name='group_id'
+                  label='选择分类'
+                  type='select'
+                  select
+                  fullWidth
+                  variant='outlined'
+                  value={newSite.group_id}
+                  onChange={(e) => {
+                    const selectedGroupId = parseInt(e.target.value, 10);
+                    setNewSite({ ...newSite, group_id: selectedGroupId });
+                    // 检查是否为子分类（parent_id不为null）
+                    const selectedGroup = groups.find(g => g.id === selectedGroupId);
+                    if (selectedGroup?.parent_id) {
+                      // 如果是子分类，更新selectedSubCategory以确保站点显示在正确的分类下
+                      setSelectedSubCategory(selectedGroupId);
+                    } else {
+                      // 如果是主分类，重置子分类选择
+                      setSelectedSubCategory(null);
+                    }
+                  }}
+                >
+                  {groups
+                    .filter(group => group.id !== undefined)
+                    .map((category) => {
+                      // 查找父分类名称，用于显示层级关系
+                      const parentCategory = groups.find(g => g.id === category.parent_id);
+                      const displayName = parentCategory 
+                        ? `└─ ${category.name}` // 添加层级缩进
+                        : category.name;
+                       
+                      return (
+                        <MenuItem key={`site-${category.id}`} value={category.id}>
+                          {displayName}
+                        </MenuItem>
+                      );
+                    })}
+                </TextField>
+                
                 <Box
                   sx={{
                     display: 'flex',
@@ -1775,39 +2036,7 @@ function App() {
           </Dialog>
 
           {/* GitHub角标 - 在移动端调整位置 */}
-          <Box
-            sx={{
-              position: 'fixed',
-              bottom: { xs: 8, sm: 16 },
-              right: { xs: 8, sm: 16 },
-              zIndex: 10,
-            }}
-          >
-            <Paper
-              component='a'
-              href='https://github.com/zqq-nuli/Navihive'
-              target='_blank'
-              rel='noopener noreferrer'
-              elevation={2}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                p: 1,
-                borderRadius: 10,
-                bgcolor: 'background.paper',
-                color: 'text.secondary',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                  color: 'text.primary',
-                  boxShadow: 4,
-                },
-                textDecoration: 'none',
-              }}
-            >
-              <GitHubIcon />
-            </Paper>
-          </Box>
+
         </Container>
       </Box>
     </ThemeProvider>

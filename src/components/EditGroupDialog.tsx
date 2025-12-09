@@ -11,12 +11,14 @@ import {
   Alert,
   FormControlLabel,
   Switch,
+  MenuItem,
 } from '@mui/material';
 import { Group } from '../API/http';
 
 interface EditGroupDialogProps {
   open: boolean;
   group: Group | null;
+  mainCategories: Group[];
   onClose: () => void;
   onSave: (group: Group) => void;
   onDelete: (groupId: number) => void;
@@ -25,19 +27,22 @@ interface EditGroupDialogProps {
 const EditGroupDialog: React.FC<EditGroupDialogProps> = ({
   open,
   group,
+  mainCategories,
   onClose,
   onSave,
   onDelete,
 }) => {
   const [name, setName] = useState('');
-  const [isPublic, setIsPublic] = useState(true); // 新增：公开/私密状态
+  const [isPublic, setIsPublic] = useState(true); // 公开/私密状态
+  const [parentId, setParentId] = useState<number | null>(null); // 父分类ID
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // 当弹窗打开时，初始化名称和公开状态
+  // 当弹窗打开时，初始化名称、公开状态和父分类
   React.useEffect(() => {
     if (group) {
       setName(group.name);
       setIsPublic(group.is_public !== 0); // 0 = 私密, 1 或 undefined = 公开
+      setParentId(group.parent_id ?? null);
     }
     // 关闭删除确认状态
     setShowDeleteConfirm(false);
@@ -50,6 +55,7 @@ const EditGroupDialog: React.FC<EditGroupDialogProps> = ({
       ...group,
       name: name.trim(),
       is_public: isPublic ? 1 : 0, // 保存 is_public 字段
+      parent_id: parentId, // 保存父分类ID
     });
   };
 
@@ -84,6 +90,25 @@ const EditGroupDialog: React.FC<EditGroupDialogProps> = ({
             variant='outlined'
             autoFocus
           />
+        </Box>
+
+        {/* 父分类选择 */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label='父分类'
+            fullWidth
+            select
+            value={parentId === null ? 'null' : parentId.toString()}
+            onChange={(e) => setParentId(e.target.value === 'null' ? null : parseInt(e.target.value, 10))}
+            variant='outlined'
+          >
+            <MenuItem value='null'>/</MenuItem>
+            {mainCategories.map((category) => (
+              <MenuItem key={`parent-${category.id}`} value={category.id.toString()}>
+                {category.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </Box>
 
         {/* 公开/私密开关 */}

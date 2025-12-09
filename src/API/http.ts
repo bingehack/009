@@ -36,6 +36,7 @@ interface Env {
 export interface Group {
   id?: number;
   name: string;
+  parent_id?: number | null; // 添加父分类ID，支持层级结构
   order_num: number;
   is_public?: number; // 0 = 私密（仅管理员可见），1 = 公开（访客可见）
   created_at?: string;
@@ -347,14 +348,14 @@ export class NavigationAPI {
   // 分组相关 API
   async getGroups(): Promise<Group[]> {
     const result = await this.db
-      .prepare('SELECT id, name, order_num, created_at, updated_at FROM groups ORDER BY order_num')
+      .prepare('SELECT id, name, order_num, parent_id, is_public, created_at, updated_at FROM groups ORDER BY parent_id, order_num')
       .all<Group>();
     return result.results || [];
   }
 
   async getGroup(id: number): Promise<Group | null> {
     const result = await this.db
-      .prepare('SELECT id, name, order_num, created_at, updated_at FROM groups WHERE id = ?')
+      .prepare('SELECT id, name, order_num, parent_id, is_public, created_at, updated_at FROM groups WHERE id = ?')
       .bind(id)
       .first<Group>();
     return result;
@@ -363,9 +364,9 @@ export class NavigationAPI {
   async createGroup(group: Group): Promise<Group> {
     const result = await this.db
       .prepare(
-        'INSERT INTO groups (name, order_num, is_public) VALUES (?, ?, ?) RETURNING id, name, order_num, is_public, created_at, updated_at'
+        'INSERT INTO groups (name, order_num, parent_id, is_public) VALUES (?, ?, ?, ?) RETURNING id, name, order_num, parent_id, is_public, created_at, updated_at'
       )
-      .bind(group.name, group.order_num, group.is_public ?? 1)
+      .bind(group.name, group.order_num, group.parent_id ?? null, group.is_public ?? 1)
       .all<Group>();
     if (!result.results || result.results.length === 0) {
       throw new Error('创建分组失败');
@@ -379,7 +380,7 @@ export class NavigationAPI {
 
   async updateGroup(id: number, group: Partial<Group>): Promise<Group | null> {
     // 字段白名单
-    const ALLOWED_FIELDS = ['name', 'order_num', 'is_public'] as const;
+    const ALLOWED_FIELDS = ['name', 'order_num', 'parent_id', 'is_public'] as const;
     type AllowedField = (typeof ALLOWED_FIELDS)[number];
 
     const updates: string[] = ['updated_at = CURRENT_TIMESTAMP'];
@@ -453,6 +454,7 @@ export class NavigationAPI {
       SELECT
         g.id as group_id,
         g.name as group_name,
+        g.parent_id as group_parent_id,
         g.order_num as group_order,
         g.is_public as group_is_public,
         g.created_at as group_created_at,
@@ -469,12 +471,13 @@ export class NavigationAPI {
         s.updated_at as site_updated_at
       FROM groups g
       LEFT JOIN sites s ON g.id = s.group_id
-      ORDER BY g.order_num ASC, s.order_num ASC
+      ORDER BY g.parent_id ASC, g.order_num ASC, s.order_num ASC
     `;
 
     const result = await this.db.prepare(query).all<{
       group_id: number;
       group_name: string;
+      group_parent_id?: number | null;
       group_order: number;
       group_is_public?: number;
       group_created_at: string;
@@ -492,7 +495,7 @@ export class NavigationAPI {
     }>();
 
     // 将查询结果转换为 GroupWithSites 格式
-    const groupsMap = new Map<number, GroupWithSites>();
+    const groupsMap = new Map<number, GroupWithSites & { subgroups?: GroupWithSites[] }>();
 
     for (const row of result.results || []) {
       // 如果分组不存在,创建它
@@ -500,11 +503,13 @@ export class NavigationAPI {
         groupsMap.set(row.group_id, {
           id: row.group_id,
           name: row.group_name,
+          parent_id: row.group_parent_id || null,
           order_num: row.group_order,
           is_public: row.group_is_public,
           created_at: row.group_created_at,
           updated_at: row.group_updated_at,
           sites: [],
+          subgroups: [],
         });
       }
 
@@ -527,7 +532,33 @@ export class NavigationAPI {
       }
     }
 
-    return Array.from(groupsMap.values());
+    // 构建层级结构
+    const rootGroups: (GroupWithSites & { subgroups?: GroupWithSites[] })[] = [];
+    
+    for (const group of groupsMap.values()) {
+      if (group.parent_id === null || group.parent_id === undefined) {
+        // 根分组（大分类）
+        rootGroups.push(group);
+      } else {
+        // 子分组（小分类）
+        const parentGroup = groupsMap.get(group.parent_id);
+        if (parentGroup) {
+          if (!parentGroup.subgroups) {
+            parentGroup.subgroups = [];
+          }
+          parentGroup.subgroups.push(group as GroupWithSites);
+        } else {
+          // 如果父分组不存在，将其作为根分组处理
+          rootGroups.push(group);
+        }
+      }
+    }
+
+    // 移除临时添加的 subgroups 属性，确保返回类型正确
+    return rootGroups.map(group => {
+      const { subgroups, ...groupWithoutSubgroups } = group;
+      return groupWithoutSubgroups;
+    });
   }
 
   async getSite(id: number): Promise<Site | null> {
@@ -744,8 +775,12 @@ export class NavigationAPI {
         },
       };
 
-      // 导入分组数据
-      for (const group of data.groups) {
+      // 将分组分为根分组和子分组
+      const rootGroups = data.groups.filter(group => !group.parent_id || group.parent_id === null);
+      const subGroups = data.groups.filter(group => group.parent_id && group.parent_id !== null);
+
+      // 先导入根分组
+      for (const group of rootGroups) {
         // 检查是否已存在同名分组
         const existingGroup = await this.getGroupByName(group.name);
 
@@ -755,10 +790,37 @@ export class NavigationAPI {
             groupMap.set(group.id, existingGroup.id as number);
           }
 
-          // 可选：更新分组顺序（如果需要）
-          // 此处可以决定是否需要更新现有分组的order_num
-          // 如果需要，可以执行：
-          // await this.updateGroup(existingGroup.id as number, { order_num: group.order_num });
+          stats.groups.merged++;
+        } else {
+          // 如果不存在同名分组，创建新分组
+          const newGroup = await this.createGroup({
+            name: group.name,
+            order_num: group.order_num,
+            parent_id: null,
+          });
+
+          // 添加到映射
+          if (group.id && newGroup.id) {
+            groupMap.set(group.id, newGroup.id);
+          }
+
+          stats.groups.created++;
+        }
+      }
+
+      // 然后导入子分组
+      for (const group of subGroups) {
+        // 检查是否已存在同名分组
+        const existingGroup = await this.getGroupByName(group.name);
+
+        // 获取映射后的父分组ID
+        const mappedParentId = group.parent_id ? groupMap.get(group.parent_id) : null;
+
+        if (existingGroup) {
+          // 如果存在同名分组，使用现有分组ID
+          if (group.id) {
+            groupMap.set(group.id, existingGroup.id as number);
+          }
 
           stats.groups.merged++;
         } else {
@@ -766,6 +828,7 @@ export class NavigationAPI {
           const newGroup = await this.createGroup({
             name: group.name,
             order_num: group.order_num,
+            parent_id: mappedParentId,
           });
 
           // 添加到映射

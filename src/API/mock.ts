@@ -5,6 +5,7 @@ const mockGroups: Group[] = [
   {
     id: 1,
     name: '常用工具',
+    parent_id: null,
     order_num: 1,
     is_public: 1, // 公开分组
     created_at: '2024-01-01T00:00:00Z',
@@ -13,6 +14,7 @@ const mockGroups: Group[] = [
   {
     id: 2,
     name: '开发资源',
+    parent_id: null,
     order_num: 2,
     is_public: 1, // 公开分组
     created_at: '2024-01-01T20:00:00Z',
@@ -21,6 +23,7 @@ const mockGroups: Group[] = [
   {
     id: 3,
     name: '私密分组',
+    parent_id: null,
     order_num: 3,
     is_public: 0, // 私密分组（仅管理员可见）
     created_at: '2024-01-01T40:00:00Z',

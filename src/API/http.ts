@@ -388,9 +388,12 @@ export class NavigationAPI {
 
     // 只允许更新白名单中的字段
     Object.entries(group).forEach(([key, value]) => {
-      if (ALLOWED_FIELDS.includes(key as AllowedField) && value !== undefined) {
+      if (ALLOWED_FIELDS.includes(key as AllowedField) && value !== undefined && value !== null) {
         updates.push(`${key} = ?`);
         params.push(value);
+      } else if (ALLOWED_FIELDS.includes(key as AllowedField) && value === null) {
+        updates.push(`${key} = NULL`);
+        // 对于NULL值，不需要添加到params中
       } else if (key !== 'id' && key !== 'created_at' && key !== 'updated_at') {
         console.warn(`尝试更新不允许的字段: ${key}`);
       }

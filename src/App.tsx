@@ -133,7 +133,7 @@ function App() {
   const [currentSortingGroupId, setCurrentSortingGroupId] = useState<number | null>(null);
   
   // 新增层级导航状态
-  const [selectedMainCategory, setSelectedMainCategory] = useState<number | null>(null);
+  const [selectedMainCategory] = useState<number | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<number | null>(null);
   
   // 分离大分类和小分类
@@ -425,11 +425,7 @@ function App() {
     }
   };
   
-  // 处理大分类选择
-  const handleMainCategorySelect = (categoryId: number) => {
-    setSelectedMainCategory(categoryId);
-    setSelectedSubCategory(null); // 重置小分类选择
-  };
+
   
   // 处理小分类选择
   const handleSubCategorySelect = (categoryId: number) => {

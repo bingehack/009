@@ -104,7 +104,7 @@ const EditGroupDialog: React.FC<EditGroupDialogProps> = ({
           >
             <MenuItem value='null'>/</MenuItem>
             {mainCategories.map((category) => (
-              <MenuItem key={`parent-${category.id}`} value={category.id.toString()}>
+              <MenuItem key={`parent-${category.id || 'unknown'}`} value={(category.id || 'null').toString()}>
                 {category.name}
               </MenuItem>
             ))}

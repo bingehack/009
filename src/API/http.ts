@@ -760,9 +760,6 @@ export class NavigationAPI {
   // 导入所有数据
   async importData(data: ExportData): Promise<ImportResult> {
     try {
-      // 创建新旧分组ID的映射
-      const groupMap = new Map<number, number>();
-
       // 统计信息
       const stats = {
         groups: {
@@ -778,72 +775,121 @@ export class NavigationAPI {
         },
       };
 
+      // 批量导入策略：
+      // 1. 先获取所有现有分组名称和站点URL，避免重复查询
+      // 2. 使用batch方法批量处理创建和更新操作
+
+      // 获取所有现有分组
+      const existingGroupsResult = await this.db
+        .prepare('SELECT id, name FROM groups')
+        .all<{ id: number; name: string }>();
+      const existingGroups = new Map(existingGroupsResult.results?.map(g => [g.name, g.id]) || []);
+
+      // 获取所有现有站点（按分组ID和URL索引）
+      const existingSitesResult = await this.db
+        .prepare('SELECT id, group_id, url FROM sites')
+        .all<{ id: number; group_id: number; url: string }>();
+      const existingSites = new Map(
+        existingSitesResult.results?.map(s => [`${s.group_id}:${s.url}`, s.id]) || []
+      );
+
+      // 创建新旧分组ID的映射
+      const groupMap = new Map<number, number>();
+      const batchStatements: D1PreparedStatement[] = [];
+
       // 将分组分为根分组和子分组
       const rootGroups = data.groups.filter(group => !group.parent_id || group.parent_id === null);
       const subGroups = data.groups.filter(group => group.parent_id && group.parent_id !== null);
 
-      // 先导入根分组
+      // 1. 批量处理根分组
       for (const group of rootGroups) {
-        // 检查是否已存在同名分组
-        const existingGroup = await this.getGroupByName(group.name);
-
-        if (existingGroup) {
+        if (existingGroups.has(group.name)) {
           // 如果存在同名分组，使用现有分组ID
+          const existingId = existingGroups.get(group.name) as number;
           if (group.id) {
-            groupMap.set(group.id, existingGroup.id as number);
+            groupMap.set(group.id, existingId);
           }
-
           stats.groups.merged++;
         } else {
-          // 如果不存在同名分组，创建新分组
-          const newGroup = await this.createGroup({
-            name: group.name,
-            order_num: group.order_num,
-            parent_id: null,
-          });
-
-          // 添加到映射
-          if (group.id && newGroup.id) {
-            groupMap.set(group.id, newGroup.id);
-          }
-
+          // 如果不存在同名分组，创建新分组（使用batch）
+          const stmt = this.db
+            .prepare('INSERT INTO groups (name, parent_id, order_num, is_public) VALUES (?, ?, ?, ?)')
+            .bind(group.name, null, group.order_num, group.is_public || 1);
+          batchStatements.push(stmt);
           stats.groups.created++;
         }
       }
 
-      // 然后导入子分组
+      // 执行分组批量创建
+      if (batchStatements.length > 0) {
+        await this.db.batch(batchStatements);
+        batchStatements.length = 0; // 清空批次
+
+        // 获取最新的分组信息，包含新创建的分组
+        const updatedGroupsResult = await this.db
+          .prepare('SELECT id, name FROM groups')
+          .all<{ id: number; name: string }>();
+        const updatedGroups = new Map(updatedGroupsResult.results?.map(g => [g.name, g.id]) || []);
+
+        // 更新分组ID映射（对于新创建的根分组）
+        for (const group of rootGroups) {
+          if (!existingGroups.has(group.name) && group.id) {
+            const newId = updatedGroups.get(group.name);
+            if (newId) {
+              groupMap.set(group.id, newId);
+            }
+          }
+        }
+      }
+
+      // 2. 批量处理子分组
       for (const group of subGroups) {
-        // 检查是否已存在同名分组
-        const existingGroup = await this.getGroupByName(group.name);
-
-        // 获取映射后的父分组ID
         const mappedParentId = group.parent_id ? groupMap.get(group.parent_id) : null;
+        
+        if (!mappedParentId) {
+          console.warn(`无法为子分组"${group.name}"找到对应的父分组ID，已跳过`);
+          continue;
+        }
 
-        if (existingGroup) {
+        if (existingGroups.has(group.name)) {
           // 如果存在同名分组，使用现有分组ID
+          const existingId = existingGroups.get(group.name) as number;
           if (group.id) {
-            groupMap.set(group.id, existingGroup.id as number);
+            groupMap.set(group.id, existingId);
           }
-
           stats.groups.merged++;
         } else {
-          // 如果不存在同名分组，创建新分组
-          const newGroup = await this.createGroup({
-            name: group.name,
-            order_num: group.order_num,
-            parent_id: mappedParentId,
-          });
-
-          // 添加到映射
-          if (group.id && newGroup.id) {
-            groupMap.set(group.id, newGroup.id);
-          }
-
+          // 如果不存在同名分组，创建新分组（使用batch）
+          const stmt = this.db
+            .prepare('INSERT INTO groups (name, parent_id, order_num, is_public) VALUES (?, ?, ?, ?)')
+            .bind(group.name, mappedParentId, group.order_num, group.is_public || 1);
+          batchStatements.push(stmt);
           stats.groups.created++;
         }
       }
 
-      // 导入站点数据，更新分组ID
+      // 执行子分组批量创建
+      if (batchStatements.length > 0) {
+        await this.db.batch(batchStatements);
+        batchStatements.length = 0; // 清空批次
+
+        // 更新分组ID映射（对于新创建的子分组）
+        const updatedGroupsResult = await this.db
+          .prepare('SELECT id, name FROM groups')
+          .all<{ id: number; name: string }>();
+        const updatedGroups = new Map(updatedGroupsResult.results?.map(g => [g.name, g.id]) || []);
+
+        for (const group of subGroups) {
+          if (!existingGroups.has(group.name) && group.id) {
+            const newId = updatedGroups.get(group.name);
+            if (newId) {
+              groupMap.set(group.id, newId);
+            }
+          }
+        }
+      }
+
+      // 3. 批量处理站点
       for (const site of data.sites) {
         // 获取新的分组ID
         const newGroupId = groupMap.get(site.group_id);
@@ -855,39 +901,46 @@ export class NavigationAPI {
           continue;
         }
 
-        // 检查该分组下是否已存在相同URL的站点
-        const existingSite = await this.getSiteByGroupIdAndUrl(newGroupId, site.url);
+        const siteKey = `${newGroupId}:${site.url}`;
 
-        if (existingSite) {
-          // 如果存在相同URL的站点，可以选择更新或跳过
-          // 这里选择更新站点信息（名称、图标、描述等）
-          await this.updateSite(existingSite.id as number, {
-            name: site.name,
-            icon: site.icon,
-            description: site.description,
-            notes: site.notes,
-            // 不更新order_num以保持现有排序
-          });
-
+        if (existingSites.has(siteKey)) {
+          // 如果存在相同URL的站点，更新信息
+          const siteId = existingSites.get(siteKey) as number;
+          const stmt = this.db
+            .prepare('UPDATE sites SET name = ?, icon = ?, description = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+            .bind(site.name, site.icon, site.description, site.notes, siteId);
+          batchStatements.push(stmt);
           stats.sites.updated++;
         } else {
           // 如果不存在相同URL的站点，创建新站点
-          await this.createSite({
-            ...site,
-            id: undefined, // 不使用旧ID
-            group_id: newGroupId,
-          });
-
+          const stmt = this.db
+            .prepare('INSERT INTO sites (group_id, name, url, icon, description, notes, order_num, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+            .bind(newGroupId, site.name, site.url, site.icon, site.description, site.notes, site.order_num, site.is_public || 1);
+          batchStatements.push(stmt);
           stats.sites.created++;
         }
       }
 
-      // 导入配置数据
+      // 执行站点批量操作
+      if (batchStatements.length > 0) {
+        await this.db.batch(batchStatements);
+        batchStatements.length = 0; // 清空批次
+      }
+
+      // 4. 批量处理配置数据
       for (const [key, value] of Object.entries(data.configs)) {
         if (key !== 'DB_INITIALIZED') {
-          // 跳过数据库初始化标志
-          await this.setConfig(key, value);
+          // 使用INSERT OR REPLACE来处理配置
+          const stmt = this.db
+            .prepare('INSERT OR REPLACE INTO configs (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)')
+            .bind(key, value);
+          batchStatements.push(stmt);
         }
+      }
+
+      // 执行配置批量操作
+      if (batchStatements.length > 0) {
+        await this.db.batch(batchStatements);
       }
 
       return {

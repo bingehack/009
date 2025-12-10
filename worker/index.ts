@@ -155,7 +155,7 @@ function createErrorResponse(
 }
 
 // 请求体大小限制配置
-const MAX_BODY_SIZE = 1024 * 1024; // 1MB
+const MAX_BODY_SIZE = 2 * 1024 * 1024; // 2MB
 
 /**
  * 验证请求体大小并解析 JSON

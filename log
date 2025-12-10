@@ -1,225 +1,88 @@
-2025-12-10T15:00:00.454Z	Initializing build environment...
-2025-12-10T15:00:02.174Z	Success: Finished initializing build environment
-2025-12-10T15:00:03.865Z	Cloning repository...
-2025-12-10T15:00:04.665Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
-2025-12-10T15:00:04.667Z	Restoring from dependencies cache
-2025-12-10T15:00:04.668Z	Restoring from build output cache
-2025-12-10T15:00:05.108Z	Installing project dependencies: npm clean-install --progress=false
-2025-12-10T15:00:07.671Z	npm warn deprecated dnd-kit@0.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
-2025-12-10T15:00:07.726Z	npm warn deprecated bcrypt-edge@0.1.1: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
-2025-12-10T15:00:18.539Z	
-2025-12-10T15:00:18.539Z	added 426 packages, and audited 427 packages in 13s
-2025-12-10T15:00:18.539Z	
-2025-12-10T15:00:18.539Z	113 packages are looking for funding
-2025-12-10T15:00:18.539Z	  run `npm fund` for details
-2025-12-10T15:00:18.552Z	
-2025-12-10T15:00:18.552Z	3 moderate severity vulnerabilities
-2025-12-10T15:00:18.552Z	
-2025-12-10T15:00:18.552Z	To address all issues (including breaking changes), run:
-2025-12-10T15:00:18.552Z	  npm audit fix --force
-2025-12-10T15:00:18.553Z	
-2025-12-10T15:00:18.553Z	Run `npm audit` for details.
-2025-12-10T15:00:18.850Z	Executing user build command: npm run build
-2025-12-10T15:00:19.061Z	
-2025-12-10T15:00:19.061Z	> daohang@1.1.0 build
-2025-12-10T15:00:19.061Z	> tsc -b && vite build
-2025-12-10T15:00:19.061Z	
-2025-12-10T15:00:40.145Z	vite v6.4.1 building for production...
-2025-12-10T15:00:40.221Z	transforming...
-2025-12-10T15:00:49.730Z	✓ 11703 modules transformed.
-2025-12-10T15:00:50.185Z	rendering chunks...
-2025-12-10T15:00:50.209Z	computing gzip size...
-2025-12-10T15:00:54.907Z	dist/index.html                                              0.63 kB │ gzip:   0.42 kB
-2025-12-10T15:00:54.908Z	dist/assets/roboto-vietnamese-400-normal-DmXaN3yE.woff       5.68 kB
-2025-12-10T15:00:54.908Z	dist/assets/roboto-vietnamese-700-normal-Dz0HwF-w.woff       5.70 kB
-2025-12-10T15:00:54.909Z	dist/assets/roboto-vietnamese-300-normal-DXBG9gdz.woff       5.73 kB
-2025-12-10T15:00:54.912Z	dist/assets/roboto-vietnamese-500-normal-DW96CsrR.woff       5.74 kB
-2025-12-10T15:00:54.912Z	dist/assets/roboto-greek-300-normal-CTj2MfNN.woff            7.71 kB
-2025-12-10T15:00:54.912Z	dist/assets/roboto-greek-400-normal-CcizSnRP.woff            7.71 kB
-2025-12-10T15:00:54.912Z	dist/assets/roboto-greek-700-normal-D3kmAf0K.woff            7.72 kB
-2025-12-10T15:00:54.912Z	dist/assets/roboto-greek-500-normal-BLLWU9W-.woff            7.75 kB
-2025-12-10T15:00:54.912Z	dist/assets/roboto-vietnamese-300-normal-CNeuLW5X.woff2      7.84 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-vietnamese-500-normal-HYpufUYk.woff2      7.84 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-vietnamese-400-normal-CDDxGrUb.woff2      7.86 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-vietnamese-700-normal-iKxYNAzq.woff2      7.88 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-symbols-500-normal-CAhAe-ik.woff          8.86 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-symbols-400-normal-Tzuungub.woff          8.88 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-symbols-700-normal-CuuvBBxy.woff          8.88 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-symbols-300-normal-kyoSXp-d.woff          8.96 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-greek-300-normal-Cnub06j7.woff2           9.56 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-greek-500-normal-BJMS0heP.woff2           9.64 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-greek-400-normal-jFM2czAU.woff2           9.64 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-greek-700-normal-BcGn9doz.woff2           9.67 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-cyrillic-400-normal-DZJji7Rx.woff        10.00 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-cyrillic-300-normal-D568C3aM.woff        10.06 kB
-2025-12-10T15:00:54.913Z	dist/assets/roboto-cyrillic-500-normal-BI4HuXre.woff        10.20 kB
-2025-12-10T15:00:54.920Z	dist/assets/roboto-cyrillic-700-normal-KqaQ5bNp.woff        10.22 kB
-2025-12-10T15:00:54.921Z	dist/assets/roboto-symbols-400-normal-fF1SLJBj.woff2        10.58 kB
-2025-12-10T15:00:54.922Z	dist/assets/roboto-symbols-300-normal-BtHl5mYl.woff2        10.62 kB
-2025-12-10T15:00:54.922Z	dist/assets/roboto-symbols-500-normal-BXFTxrNR.woff2        10.73 kB
-2025-12-10T15:00:54.923Z	dist/assets/roboto-symbols-700-normal-rJi6RjIy.woff2        10.86 kB
-2025-12-10T15:00:54.923Z	dist/assets/roboto-cyrillic-300-normal-BoeCr7ev.woff2       11.83 kB
-2025-12-10T15:00:54.924Z	dist/assets/roboto-cyrillic-400-normal-DAIM1_dR.woff2       11.84 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-cyrillic-700-normal-BiSG5NnW.woff2       11.94 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-cyrillic-500-normal-hCeO1jFL.woff2       11.98 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-latin-ext-400-normal-eTRLN0Nt.woff       12.90 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-latin-ext-700-normal-BS1OuQqR.woff       12.90 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-latin-ext-500-normal-FFcS8vBN.woff       12.94 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-latin-ext-300-normal-Tcf9y2tg.woff       13.02 kB
-2025-12-10T15:00:54.925Z	dist/assets/roboto-latin-ext-300-normal-BOz0oSmX.woff2      13.74 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-latin-ext-400-normal-ZYmyxeOy.woff2      13.74 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-latin-ext-500-normal-C_ARlJGk.woff2      13.98 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-latin-ext-700-normal-70GS1MYH.woff2      14.02 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-300-normal-DQdcc27I.woff    15.74 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-400-normal-DtZHuW6i.woff    15.76 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-500-normal-C927yMrb.woff    15.87 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-700-normal-BuQgZIrO.woff    15.88 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-400-normal-DzMWdK87.woff2   16.85 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-300-normal-CUPJdUZp.woff2   16.91 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-500-normal-B7rQpwPu.woff2   17.16 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-cyrillic-ext-700-normal-UFn0vR9r.woff2   17.21 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-math-400-normal-rzxYvyVt.woff            18.73 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-math-500-normal-DaFX-ZC8.woff            18.80 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-math-700-normal-pYD1nhov.woff            18.87 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-math-300-normal-BU9CUCyj.woff            18.91 kB
-2025-12-10T15:00:54.926Z	dist/assets/roboto-math-400-normal-B3wgz80t.woff2           19.66 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-math-300-normal-BMxwzQmU.woff2           19.68 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-math-700-normal-VUAI6Bz2.woff2           19.95 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-math-500-normal-CFNaIMFC.woff2           19.98 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-400-normal-068yxgMN.woff           20.22 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-500-normal-CC5nhZkh.woff           20.34 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-700-normal-DUekQERp.woff           20.37 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-300-normal-KByCBsad.woff           20.46 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-400-normal-CNwBRw8h.woff2          20.61 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-300-normal-CztWkFGs.woff2          20.71 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-500-normal-CkrA1NAy.woff2          20.93 kB
-2025-12-10T15:00:54.927Z	dist/assets/roboto-latin-700-normal-CXeAXeti.woff2          21.00 kB
-2025-12-10T15:00:54.927Z	dist/assets/index-DiQQfLqp.css                              68.87 kB │ gzip:  27.45 kB
-2025-12-10T15:00:54.927Z	dist/assets/index-v3zsFUSD.js                              593.36 kB │ gzip: 184.63 kB
-2025-12-10T15:00:54.932Z	
-2025-12-10T15:00:54.935Z	(!) Some chunks are larger than 500 kB after minification. Consider:
-2025-12-10T15:00:54.939Z	- Using dynamic import() to code-split the application
-2025-12-10T15:00:54.943Z	- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
-2025-12-10T15:00:54.946Z	- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-2025-12-10T15:00:54.949Z	✓ built in 14.73s
-2025-12-10T15:00:55.104Z	Success: Build command completed
-2025-12-10T15:00:55.334Z	Executing user deploy command: npm run deploy
-2025-12-10T15:00:55.551Z	
-2025-12-10T15:00:55.552Z	> daohang@1.1.0 deploy
-2025-12-10T15:00:55.552Z	> pnpm run build && wrangler deploy
-2025-12-10T15:00:55.552Z	
-2025-12-10T15:00:56.041Z	
-2025-12-10T15:00:56.041Z	> daohang@1.1.0 build /opt/buildhome/repo
-2025-12-10T15:00:56.041Z	> tsc -b && vite build
-2025-12-10T15:00:56.041Z	
-2025-12-10T15:01:00.944Z	vite v6.4.1 building for production...
-2025-12-10T15:01:00.998Z	transforming...
-2025-12-10T15:01:10.139Z	✓ 11703 modules transformed.
-2025-12-10T15:01:10.630Z	rendering chunks...
-2025-12-10T15:01:10.654Z	computing gzip size...
-2025-12-10T15:01:10.671Z	dist/index.html                                              0.63 kB │ gzip:   0.42 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-vietnamese-400-normal-DmXaN3yE.woff       5.68 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-vietnamese-700-normal-Dz0HwF-w.woff       5.70 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-vietnamese-300-normal-DXBG9gdz.woff       5.73 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-vietnamese-500-normal-DW96CsrR.woff       5.74 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-greek-300-normal-CTj2MfNN.woff            7.71 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-greek-400-normal-CcizSnRP.woff            7.71 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-greek-700-normal-D3kmAf0K.woff            7.72 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-greek-500-normal-BLLWU9W-.woff            7.75 kB
-2025-12-10T15:01:10.672Z	dist/assets/roboto-vietnamese-300-normal-CNeuLW5X.woff2      7.84 kB
-2025-12-10T15:01:10.673Z	dist/assets/roboto-vietnamese-500-normal-HYpufUYk.woff2      7.84 kB
-2025-12-10T15:01:10.673Z	dist/assets/roboto-vietnamese-400-normal-CDDxGrUb.woff2      7.86 kB
-2025-12-10T15:01:10.675Z	dist/assets/roboto-vietnamese-700-normal-iKxYNAzq.woff2      7.88 kB
-2025-12-10T15:01:10.675Z	dist/assets/roboto-symbols-500-normal-CAhAe-ik.woff          8.86 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-symbols-400-normal-Tzuungub.woff          8.88 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-symbols-700-normal-CuuvBBxy.woff          8.88 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-symbols-300-normal-kyoSXp-d.woff          8.96 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-greek-300-normal-Cnub06j7.woff2           9.56 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-greek-500-normal-BJMS0heP.woff2           9.64 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-greek-400-normal-jFM2czAU.woff2           9.64 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-greek-700-normal-BcGn9doz.woff2           9.67 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-cyrillic-400-normal-DZJji7Rx.woff        10.00 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-cyrillic-300-normal-D568C3aM.woff        10.06 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-cyrillic-500-normal-BI4HuXre.woff        10.20 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-cyrillic-700-normal-KqaQ5bNp.woff        10.22 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-symbols-400-normal-fF1SLJBj.woff2        10.58 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-symbols-300-normal-BtHl5mYl.woff2        10.62 kB
-2025-12-10T15:01:10.676Z	dist/assets/roboto-symbols-500-normal-BXFTxrNR.woff2        10.73 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-symbols-700-normal-rJi6RjIy.woff2        10.86 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-cyrillic-300-normal-BoeCr7ev.woff2       11.83 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-cyrillic-400-normal-DAIM1_dR.woff2       11.84 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-cyrillic-700-normal-BiSG5NnW.woff2       11.94 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-cyrillic-500-normal-hCeO1jFL.woff2       11.98 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-latin-ext-700-normal-BS1OuQqR.woff       12.90 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-latin-ext-400-normal-eTRLN0Nt.woff       12.90 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-latin-ext-500-normal-FFcS8vBN.woff       12.94 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-latin-ext-300-normal-Tcf9y2tg.woff       13.02 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-latin-ext-300-normal-BOz0oSmX.woff2      13.74 kB
-2025-12-10T15:01:10.677Z	dist/assets/roboto-latin-ext-400-normal-ZYmyxeOy.woff2      13.74 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-latin-ext-500-normal-C_ARlJGk.woff2      13.98 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-latin-ext-700-normal-70GS1MYH.woff2      14.02 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-cyrillic-ext-300-normal-DQdcc27I.woff    15.74 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-cyrillic-ext-400-normal-DtZHuW6i.woff    15.76 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-cyrillic-ext-500-normal-C927yMrb.woff    15.87 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-cyrillic-ext-700-normal-BuQgZIrO.woff    15.88 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-cyrillic-ext-400-normal-DzMWdK87.woff2   16.85 kB
-2025-12-10T15:01:10.678Z	dist/assets/roboto-cyrillic-ext-300-normal-CUPJdUZp.woff2   16.91 kB
-2025-12-10T15:01:10.679Z	dist/assets/roboto-cyrillic-ext-500-normal-B7rQpwPu.woff2   17.16 kB
-2025-12-10T15:01:10.679Z	dist/assets/roboto-cyrillic-ext-700-normal-UFn0vR9r.woff2   17.21 kB
-2025-12-10T15:01:10.679Z	dist/assets/roboto-math-400-normal-rzxYvyVt.woff            18.73 kB
-2025-12-10T15:01:10.679Z	dist/assets/roboto-math-500-normal-DaFX-ZC8.woff            18.80 kB
-2025-12-10T15:01:10.680Z	dist/assets/roboto-math-700-normal-pYD1nhov.woff            18.87 kB
-2025-12-10T15:01:10.680Z	dist/assets/roboto-math-300-normal-BU9CUCyj.woff            18.91 kB
-2025-12-10T15:01:10.680Z	dist/assets/roboto-math-400-normal-B3wgz80t.woff2           19.66 kB
-2025-12-10T15:01:10.680Z	dist/assets/roboto-math-300-normal-BMxwzQmU.woff2           19.68 kB
-2025-12-10T15:01:10.680Z	dist/assets/roboto-math-700-normal-VUAI6Bz2.woff2           19.95 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-math-500-normal-CFNaIMFC.woff2           19.98 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-400-normal-068yxgMN.woff           20.22 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-500-normal-CC5nhZkh.woff           20.34 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-700-normal-DUekQERp.woff           20.37 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-300-normal-KByCBsad.woff           20.46 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-400-normal-CNwBRw8h.woff2          20.61 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-300-normal-CztWkFGs.woff2          20.71 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-500-normal-CkrA1NAy.woff2          20.93 kB
-2025-12-10T15:01:10.681Z	dist/assets/roboto-latin-700-normal-CXeAXeti.woff2          21.00 kB
-2025-12-10T15:01:10.681Z	dist/assets/index-DiQQfLqp.css                              68.87 kB │ gzip:  27.45 kB
-2025-12-10T15:01:10.681Z	dist/assets/index-v3zsFUSD.js                              593.36 kB │ gzip: 184.63 kB
-2025-12-10T15:01:10.681Z	✓ built in 9.71s
-2025-12-10T15:01:10.681Z	
-2025-12-10T15:01:10.682Z	(!) Some chunks are larger than 500 kB after minification. Consider:
-2025-12-10T15:01:10.682Z	- Using dynamic import() to code-split the application
-2025-12-10T15:01:10.682Z	- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
-2025-12-10T15:01:10.682Z	- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-2025-12-10T15:01:11.756Z	
-2025-12-10T15:01:11.756Z	 ⛅️ wrangler 4.53.0
-2025-12-10T15:01:11.756Z	───────────────────
-2025-12-10T15:01:11.944Z	▲ [WARNING] Failed to match Worker name. Your config file is using the Worker name "009tg", but the CI system expected "009". Overriding using the CI provided Worker name. Workers Builds connected builds will attempt to open a pull request to resolve this config name mismatch.
-2025-12-10T15:01:11.945Z	
-2025-12-10T15:01:11.945Z	
-2025-12-10T15:01:13.667Z	🌀 Building list of assets...
-2025-12-10T15:01:13.669Z	✨ Read 70 files from the assets directory /opt/buildhome/repo/dist
-2025-12-10T15:01:13.691Z	🌀 Starting asset upload...
-2025-12-10T15:01:15.272Z	No updated asset files to upload. Proceeding with deployment...
-2025-12-10T15:01:15.277Z	Total Upload: 77.63 KiB / gzip: 19.95 KiB
-2025-12-10T15:01:16.630Z	Your Worker has access to the following bindings:
-2025-12-10T15:01:16.630Z	Binding                                Resource                  
-2025-12-10T15:01:16.631Z	env.DB (navigation-db)                 D1 Database               
-2025-12-10T15:01:16.631Z	env.AUTH_ENABLED ("true")              Environment Variable      
-2025-12-10T15:01:16.631Z	env.AUTH_USERNAME ("linuxdo")          Environment Variable      
-2025-12-10T15:01:16.631Z	env.AUTH_PASSWORD ("linuxdo")          Environment Variable      
-2025-12-10T15:01:16.631Z	env.AUTH_SECRET ("linuxdo")            Environment Variable      
-2025-12-10T15:01:16.631Z	
-2025-12-10T15:01:16.637Z	
-2025-12-10T15:01:16.638Z	✘ [ERROR] A request to the Cloudflare API (/accounts/81180424017548c22404580398672854/workers/scripts/009/versions) failed.
-2025-12-10T15:01:16.638Z	
-2025-12-10T15:01:16.638Z	  binding DB of type d1 must have a database that already exists. Use wrangler or the UI to create the database. [code: 10021]
-2025-12-10T15:01:16.638Z	  To learn more about this error, visit: https://developers.cloudflare.com/workers/observability/errors/#validation-errors-10021
-2025-12-10T15:01:16.638Z	
-2025-12-10T15:01:16.638Z	  
-2025-12-10T15:01:16.639Z	  If you think this is a bug, please open an issue at: https://github.com/cloudflare/workers-sdk/issues/new/choose
-2025-12-10T15:01:16.639Z	
-2025-12-10T15:01:16.639Z	
-2025-12-10T15:01:16.639Z	
-2025-12-10T15:01:16.639Z	Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
-2025-12-10T15:01:16.658Z	🪵  Logs were written to "/opt/buildhome/.config/.wrangler/logs/wrangler-2025-12-10_15-01-11_280.log"
-2025-12-10T15:01:16.701Z	Failed: error occurred while running deploy command
+2025-12-10T17:10:10.063Z	Initializing build environment...
+2025-12-10T17:10:11.924Z	Success: Finished initializing build environment
+2025-12-10T17:10:12.716Z	Cloning repository...
+2025-12-10T17:10:15.907Z	Restoring from dependencies cache
+2025-12-10T17:10:15.909Z	Restoring from build output cache
+2025-12-10T17:10:15.915Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
+2025-12-10T17:10:19.656Z	Success: Dependencies restored from build cache.
+2025-12-10T17:10:19.856Z	Installing project dependencies: npm clean-install --progress=false
+2025-12-10T17:10:30.248Z	npm warn deprecated dnd-kit@0.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+2025-12-10T17:10:30.601Z	npm warn deprecated bcrypt-edge@0.1.1: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+2025-12-10T17:10:51.126Z	
+2025-12-10T17:10:51.127Z	added 426 packages, and audited 427 packages in 29s
+2025-12-10T17:10:51.127Z	
+2025-12-10T17:10:51.127Z	113 packages are looking for funding
+2025-12-10T17:10:51.127Z	  run `npm fund` for details
+2025-12-10T17:10:51.141Z	
+2025-12-10T17:10:51.141Z	3 moderate severity vulnerabilities
+2025-12-10T17:10:51.141Z	
+2025-12-10T17:10:51.141Z	To address all issues (including breaking changes), run:
+2025-12-10T17:10:51.142Z	  npm audit fix --force
+2025-12-10T17:10:51.142Z	
+2025-12-10T17:10:51.142Z	Run `npm audit` for details.
+2025-12-10T17:10:51.477Z	Executing user build command: npm run build
+2025-12-10T17:10:51.795Z	
+2025-12-10T17:10:51.795Z	> daohang@1.1.0 build
+2025-12-10T17:10:51.795Z	> tsc -b && vite build
+2025-12-10T17:10:51.795Z	
+2025-12-10T17:10:58.370Z	src/API/http.ts(821,36): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.370Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.371Z	src/API/http.ts(850,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.371Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.371Z	src/API/http.ts(879,84): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.371Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.372Z	src/API/mock.ts(438,34): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.372Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.372Z	src/API/mock.ts(483,31): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.372Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.217Z	src/API/http.ts(821,36): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:59.218Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.218Z	src/API/http.ts(850,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:59.219Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.219Z	src/API/http.ts(879,84): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:59.219Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.281Z	Failed: error occurred while running build command
+2025-12-10T17:10:10.063Z	Initializing build environment...
+2025-12-10T17:10:11.924Z	Success: Finished initializing build environment
+2025-12-10T17:10:12.716Z	Cloning repository...
+2025-12-10T17:10:15.907Z	Restoring from dependencies cache
+2025-12-10T17:10:15.909Z	Restoring from build output cache
+2025-12-10T17:10:15.915Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
+2025-12-10T17:10:19.656Z	Success: Dependencies restored from build cache.
+2025-12-10T17:10:19.856Z	Installing project dependencies: npm clean-install --progress=false
+2025-12-10T17:10:30.248Z	npm warn deprecated dnd-kit@0.0.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+2025-12-10T17:10:30.601Z	npm warn deprecated bcrypt-edge@0.1.1: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+2025-12-10T17:10:51.126Z	
+2025-12-10T17:10:51.127Z	added 426 packages, and audited 427 packages in 29s
+2025-12-10T17:10:51.127Z	
+2025-12-10T17:10:51.127Z	113 packages are looking for funding
+2025-12-10T17:10:51.127Z	  run `npm fund` for details
+2025-12-10T17:10:51.141Z	
+2025-12-10T17:10:51.141Z	3 moderate severity vulnerabilities
+2025-12-10T17:10:51.141Z	
+2025-12-10T17:10:51.141Z	To address all issues (including breaking changes), run:
+2025-12-10T17:10:51.142Z	  npm audit fix --force
+2025-12-10T17:10:51.142Z	
+2025-12-10T17:10:51.142Z	Run `npm audit` for details.
+2025-12-10T17:10:51.477Z	Executing user build command: npm run build
+2025-12-10T17:10:51.795Z	
+2025-12-10T17:10:51.795Z	> daohang@1.1.0 build
+2025-12-10T17:10:51.795Z	> tsc -b && vite build
+2025-12-10T17:10:51.795Z	
+2025-12-10T17:10:58.370Z	src/API/http.ts(821,36): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.370Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.371Z	src/API/http.ts(850,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.371Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.371Z	src/API/http.ts(879,84): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.371Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.372Z	src/API/mock.ts(438,34): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.372Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:58.372Z	src/API/mock.ts(483,31): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:58.372Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.217Z	src/API/http.ts(821,36): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:59.218Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.218Z	src/API/http.ts(850,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:59.219Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.219Z	src/API/http.ts(879,84): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+2025-12-10T17:10:59.219Z	  Type 'undefined' is not assignable to type 'number'.
+2025-12-10T17:10:59.281Z	Failed: error occurred while running build command

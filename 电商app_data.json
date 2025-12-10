@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Gmarket",
+    "description": "Gmarket是一家位于韩国的电子商务网站。",
+    "official_website": "https://www.gmarket.co.kr"
+  },
+  {
+    "name": "Tokopedia",
+    "description": "Tokopedia是一家专注于电子商务的印尼科技公司。",
+    "official_website": "https://www.tokopedia.com"
+  },
+  {
+    "name": "Lazada",
+    "description": "Lazada Group (Lazada ) 是由Maximilian Bittner于2012 年在Rocket Internet的支持下创立的国际电子商务公司，由阿里巴巴集团拥有。",
+    "official_website": "https://www.lazada.com"
+  },
+  {
+    "name": "AliExpress",
+    "description": "全球速卖通（中文：全球速卖通）是一家总部位于中国的在线零售服务，由阿里巴巴集团拥有。",
+    "official_website": "https://www.aliexpress.com"
+  },
+  {
+    "name": "Wish",
+    "description": "Wish是一个美国在线电子商务平台，用于卖家和买家之间的交易。",
+    "official_website": "https://www.wish.com"
+  },
+  {
+    "name": "Shopee",
+    "description": "虾皮购物（英语：Shopee），之前称为虾皮拍卖，是一个线上电子商务平台。",
+    "official_website": "https://www.shopee.com"
+  },
+  {
+    "name": "Spotify",
+    "description": "Spotify是一家瑞典线上音乐串流媒体平台，目前是全球最大的串流音乐服务商",
+    "official_website": "https://www.spotify.com"
+  },
+  {
+    "name": "Amazon",
+    "description": "亚马逊公司是一家总部位于美国西雅图的跨国电子商务企业，目前是全球最大的网际网路线上零售商之一。",
+    "official_website": "https://www.amazon.com"
+  },
+  {
+    "name": "eBay",
+    "description": "eBay（中文：电子湾、亿贝、易贝）是可让全球民众上网买卖物品的线上拍卖及购物网站。",
+    "official_website": "https://www.ebay.com"
+  }
+]

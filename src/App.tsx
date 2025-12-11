@@ -501,11 +501,6 @@ function App() {
   const filterPublicData = (groups: GroupWithSites[]): GroupWithSites[] => {
     // 递归过滤函数
     const filterGroup = (group: GroupWithSites): GroupWithSites | null => {
-      // 只保留公开分组
-      if (group.is_public !== 1) {
-        return null;
-      }
-      
       // 过滤分组内的公开站点
       const filteredSites = group.sites.filter(site => site.is_public === 1);
       
@@ -518,6 +513,33 @@ function App() {
             filteredSubgroups.push(filteredSubgroup);
           }
         }
+      }
+      
+      // 检查当前分组是否需要保留：
+      // 1. 对于根分组，只有当它是公开的，或者它有公开的子分组时才保留
+      // 2. 对于子分组，只有当它是公开的，或者它有公开的子分组时才保留
+      // 3. 如果分组有公开站点，无论是否是根分组都保留
+      const hasPublicSites = filteredSites.length > 0;
+      const hasPublicSubgroups = filteredSubgroups.length > 0;
+      const isPublic = group.is_public === 1;
+      
+      // 如果是根分组，需要满足：
+      // - 分组是公开的，且有公开站点或公开子分组，或者
+      // - 分组有公开的子分组（即使分组本身不公开）
+      if (group.parent_id === 0) {
+        if (!isPublic && !hasPublicSubgroups) {
+          return null;
+        }
+      } else {
+        // 对于子分组，必须是公开的才能被保留
+        if (!isPublic) {
+          return null;
+        }
+      }
+      
+      // 只有当分组有公开站点或公开子分组时才保留
+      if (!hasPublicSites && !hasPublicSubgroups) {
+        return null;
       }
       
       return {

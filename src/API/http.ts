@@ -408,7 +408,7 @@ export class NavigationAPI {
     // 构建安全的参数化查询
     const query = `UPDATE groups SET ${updates.join(
       ', '
-    )} WHERE id = ? RETURNING id, name, order_num, created_at, updated_at`;
+    )} WHERE id = ? RETURNING id, name, order_num, parent_id, is_public, created_at, updated_at`;
     params.push(id);
 
     const result = await this.db
@@ -979,7 +979,7 @@ export class NavigationAPI {
   // 根据名称查询分组
   async getGroupByName(name: string): Promise<Group | null> {
     const result = await this.db
-      .prepare('SELECT id, name, order_num, created_at, updated_at FROM groups WHERE name = ?')
+      .prepare('SELECT id, name, order_num, parent_id, is_public, created_at, updated_at FROM groups WHERE name = ?')
       .bind(name)
       .first<Group>();
     return result;

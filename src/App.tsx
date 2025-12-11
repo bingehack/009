@@ -497,6 +497,48 @@ function App() {
     setSnackbarOpen(false);
   };
 
+  // 过滤公开数据（用于访客模式）
+  const filterPublicData = (groups: GroupWithSites[]): GroupWithSites[] => {
+    // 递归过滤函数
+    const filterGroup = (group: GroupWithSites): GroupWithSites | null => {
+      // 只保留公开分组
+      if (group.is_public !== 1) {
+        return null;
+      }
+      
+      // 过滤分组内的公开站点
+      const filteredSites = group.sites.filter(site => site.is_public === 1);
+      
+      // 递归过滤子分组
+      const filteredSubgroups: GroupWithSites[] = [];
+      if (group.subgroups && group.subgroups.length > 0) {
+        for (const subgroup of group.subgroups) {
+          const filteredSubgroup = filterGroup(subgroup);
+          if (filteredSubgroup) {
+            filteredSubgroups.push(filteredSubgroup);
+          }
+        }
+      }
+      
+      return {
+        ...group,
+        sites: filteredSites,
+        subgroups: filteredSubgroups.length > 0 ? filteredSubgroups : undefined
+      };
+    };
+    
+    // 过滤所有根分组
+    const filteredGroups: GroupWithSites[] = [];
+    for (const group of groups) {
+      const filteredGroup = filterGroup(group);
+      if (filteredGroup) {
+        filteredGroups.push(filteredGroup);
+      }
+    }
+    
+    return filteredGroups;
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -504,8 +546,11 @@ function App() {
 
       // 使用新的 getGroupsWithSites API 优化 N+1 查询问题
       const groupsWithSites = await api.getGroupsWithSites();
+      
+      // 根据认证状态过滤数据
+      const filteredGroups = isAuthenticated ? groupsWithSites : filterPublicData(groupsWithSites);
 
-      setGroups(groupsWithSites);
+      setGroups(filteredGroups);
     } catch (error) {
       console.error('加载数据失败:', error);
       handleError('加载数据失败: ' + (error instanceof Error ? error.message : '未知错误'));

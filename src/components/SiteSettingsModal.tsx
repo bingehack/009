@@ -128,20 +128,42 @@ export default function SiteSettingsModal({
       return;
     }
 
-    // 验证图标 URL（如果提供）
-    if (formData.icon && !isSecureUrl(formData.icon) && !formData.icon.startsWith('/')) {
-      setValidationError('图标 URL 不安全，只允许 HTTPS 协议和公网地址');
+    // 验证URL格式
+    try {
+      let fullUrl = formData.url;
+      if (!/^https?:\/\//i.test(fullUrl)) {
+        fullUrl = 'http://' + fullUrl;
+      }
+      new URL(fullUrl);
+    } catch {
+      setValidationError('URL格式不正确，请输入有效的网站地址');
       return;
+    }
+
+    // 验证图标 URL（如果提供）
+    if (formData.icon) {
+      // 清理icon字段，去除可能的反引号和前后空格
+      const cleanedIcon = formData.icon.trim().replace(/^`|`$/g, '');
+      if (cleanedIcon && !isSecureUrl(cleanedIcon) && !cleanedIcon.startsWith('/')) {
+        setValidationError('图标 URL 不安全，只允许 HTTPS 协议和公网地址');
+        return;
+      }
     }
 
     // 清除验证错误
     setValidationError(null);
 
+    // 清理icon字段，去除可能的反引号和前后空格
+    const cleanedFormData = {
+      ...formData,
+      icon: formData.icon ? formData.icon.trim().replace(/^`|`$/g, '') : '',
+    };
+
     // 更新网站信息，将group_id转为数字
     onUpdate({
       ...site,
-      ...formData,
-      group_id: Number(formData.group_id),
+      ...cleanedFormData,
+      group_id: Number(cleanedFormData.group_id),
     });
 
     onClose();

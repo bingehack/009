@@ -134,7 +134,8 @@ function App() {
   
   // 新增层级导航状态
   const [selectedMainCategory] = useState<number | null>(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<number | null>(null);
+// 子分类选择状态 - 使用对象来存储每个大类对应的选中子分类
+  const [selectedSubCategories, setSelectedSubCategories] = useState<Record<number, number | null>>({});
   
   // 分离大分类和小分类
   const mainCategories = useMemo(() => {
@@ -193,7 +194,7 @@ function App() {
   // 获取当前需要显示的分组（如果有选中的小分类则只显示该小分类，否则显示大分类下的所有小分类以及大分类本身）
   const visibleGroups = useMemo(() => {
     // 始终显示所有顶级分类
-    if (selectedSubCategory) {
+    if (selectedSubCategories && Object.values(selectedSubCategories).some(id => id !== null)) {
       // 当选择子分类时，显示所有顶级分类
       return groups.filter(group => !group.parent_id);
     } else if (selectedMainCategory) {
@@ -203,7 +204,7 @@ function App() {
       );
     }
     return groups;
-  }, [groups, selectedMainCategory, selectedSubCategory]);
+  }, [groups, selectedMainCategory, selectedSubCategories]);
   
   // 获取当前需要显示的层级分组
   const visibleHierarchicalGroups = useMemo(() => {
@@ -429,7 +430,12 @@ function App() {
   
   // 处理小分类选择
   const handleSubCategorySelect = (categoryId: number) => {
-    setSelectedSubCategory(categoryId);
+    if (selectedMainCategory) {
+      setSelectedSubCategories(prev => ({
+        ...prev,
+        [selectedMainCategory]: categoryId
+      }));
+    }
   };
 
   useEffect(() => {
@@ -679,8 +685,17 @@ function App() {
 
   // 新增站点相关函数
   const handleOpenAddSite = (groupId: number) => {
-    // 如果有选中的子分类，则使用子分类ID作为group_id
-    const targetGroupId = selectedSubCategory || groupId;
+    // 查找当前分组，判断是大类还是子分类
+    const currentGroup = groups.find((g) => g.id === groupId);
+    let targetGroupId = groupId;
+    
+    if (currentGroup?.parent_id === null || currentGroup?.parent_id === undefined) {
+      // 如果是大类，检查是否有选中的子分类
+      const selectedSubCatId = selectedSubCategories[groupId] || null;
+      if (selectedSubCatId) {
+        targetGroupId = selectedSubCatId;
+      }
+    }
     
     const group = groups.find((g) => g.id === targetGroupId);
     const maxOrderNum = group?.sites.length
@@ -719,7 +734,25 @@ function App() {
         return;
       }
 
-      await api.createSite(newSite as Site);
+      // 验证URL格式
+      try {
+        let fullUrl = newSite.url;
+        if (!/^https?:\/\//i.test(fullUrl)) {
+          fullUrl = 'http://' + fullUrl;
+        }
+        new URL(fullUrl);
+      } catch {
+        handleError('URL格式不正确，请输入有效的网站地址');
+        return;
+      }
+
+      // 清理icon字段，去除可能的反引号和前后空格
+      const cleanedSite = {
+        ...newSite,
+        icon: newSite.icon ? newSite.icon.trim().replace(/^`|`$/g, '') : '',
+      };
+
+      await api.createSite(cleanedSite as Site);
       await fetchData(); // 重新加载数据
       handleCloseAddSite();
     } catch (error) {
@@ -1359,8 +1392,15 @@ function App() {
                     }}
                   >
                     <Button
-                      variant={!selectedSubCategory ? 'contained' : 'outlined'}
-                      onClick={() => setSelectedSubCategory(null)}
+                      variant={!selectedSubCategories[selectedMainCategory || 0] ? 'contained' : 'outlined'}
+                      onClick={() => {
+                        if (selectedMainCategory) {
+                          setSelectedSubCategories(prev => ({
+                            ...prev,
+                            [selectedMainCategory]: null
+                          }));
+                        }
+                      }}
                       sx={{
                         px: 3,
                         py: 1,
@@ -1375,7 +1415,7 @@ function App() {
                     {subCategories.map((category) => (
                       <Button
                         key={`sub-${category.id}`}
-                        variant={selectedSubCategory === category.id ? 'contained' : 'outlined'}
+                        variant={selectedSubCategories[selectedMainCategory || 0] === category.id ? 'contained' : 'outlined'}
                         onClick={() => handleSubCategorySelect(category.id)}
                         sx={{
                           px: 3,
@@ -1439,10 +1479,13 @@ function App() {
                           mainCategories={mainCategories}
                           onSubCategoryClick={(subgroupId) => {
                             // 处理子分类点击事件
-                            console.log('Subcategory clicked:', subgroupId);
-                            setSelectedSubCategory(subgroupId);
+                            console.log('Subcategory clicked:', subgroupId, 'for group:', group.id);
+                            setSelectedSubCategories(prev => ({
+                              ...prev,
+                              [group.id]: subgroupId
+                            }));
                           }}
-                          selectedSubCategory={selectedSubCategory}
+                          selectedSubCategory={{ mainCategoryId: group.id, subCategoryId: selectedSubCategories[group.id] || null }}
                         />
                       </Box>
                     ))}
@@ -1599,12 +1642,19 @@ function App() {
                     setNewSite({ ...newSite, group_id: selectedGroupId });
                     // 检查是否为子分类（parent_id不为null）
                     const selectedGroup = groups.find(g => g.id === selectedGroupId);
-                    if (selectedGroup?.parent_id) {
-                      // 如果是子分类，更新selectedSubCategory以确保站点显示在正确的分类下
-                      setSelectedSubCategory(selectedGroupId);
+                    if (selectedGroup?.parent_id !== undefined && selectedGroup?.parent_id !== null) {
+                        // 如果是子分类，更新selectedSubCategories以确保站点显示在正确的分类下
+                        const parentId = selectedGroup.parent_id as number;
+                        setSelectedSubCategories(prev => ({
+                          ...prev,
+                          [parentId]: selectedGroupId
+                        }));
                     } else {
-                      // 如果是主分类，重置子分类选择
-                      setSelectedSubCategory(null);
+                      // 如果是主分类，重置该分类的子分类选择
+                      setSelectedSubCategories(prev => ({
+                        ...prev,
+                        [selectedGroupId]: null
+                      }));
                     }
                   }}
                 >

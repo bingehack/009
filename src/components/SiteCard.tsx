@@ -1,5 +1,5 @@
 // src/components/SiteCard.tsx
-import { useState, memo } from 'react';
+import { useState, memo, useRef } from 'react';
 import { Site } from '../API/http';
 import SiteSettingsModal from './SiteSettingsModal';
 import { useSortable } from '@dnd-kit/sortable';
@@ -41,6 +41,7 @@ const SiteCard = memo(function SiteCard({
   const [showSettings, setShowSettings] = useState(false);
   const [iconError, setIconError] = useState(!site.icon);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const isImageLoadedRef = useRef(false);
 
   // 使用dnd-kit的useSortable hook
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -81,11 +82,16 @@ const SiteCard = memo(function SiteCard({
   // 处理图标加载错误
   const handleIconError = () => {
     setIconError(true);
+    // 确保imageLoaded为true，以隐藏骨架屏
+    setImageLoaded(true);
   };
 
   // 处理图片加载完成
   const handleImageLoad = () => {
-    setImageLoaded(true);
+    if (!isImageLoadedRef.current) {
+      isImageLoadedRef.current = true;
+      setImageLoaded(true);
+    }
   };
 
   // 卡片内容

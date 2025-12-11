@@ -188,10 +188,15 @@ export class NavigationClient {
   }
 
   async deleteSite(id: number): Promise<boolean> {
-    const response = await this.request(`sites/${id}`, {
-      method: 'DELETE',
-    });
-    return response.success;
+    try {
+      await this.request(`sites/${id}`, {
+        method: 'DELETE',
+      });
+      return true;
+    } catch (error) {
+      console.error('删除站点API调用失败:', error);
+      throw error;
+    }
   }
 
   // 配置相关API

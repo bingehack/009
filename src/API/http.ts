@@ -364,16 +364,12 @@ export class NavigationAPI {
   }
 
   async createGroup(group: Group): Promise<Group> {
-    const result = await this.db
+    const createdGroup = await this.db
       .prepare(
         'INSERT INTO groups (name, order_num, parent_id, is_public) VALUES (?, ?, ?, ?) RETURNING id, name, order_num, parent_id, is_public, created_at, updated_at'
       )
       .bind(group.name, group.order_num, group.parent_id ?? null, group.is_public ?? 1)
-      .all<Group>();
-    if (!result.results || result.results.length === 0) {
-      throw new Error('创建分组失败');
-    }
-    const createdGroup = result.results[0];
+      .first<Group>();
     if (!createdGroup) {
       throw new Error('创建分组失败');
     }

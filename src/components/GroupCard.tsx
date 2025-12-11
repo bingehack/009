@@ -174,9 +174,8 @@ const GroupCard: React.FC<GroupCardProps> = ({
     if (savedState) {
       return JSON.parse(savedState);
     }
-    // 没有保存的状态时，让特定分类默认展开
-    const defaultExpandedCategories = ['全球接码', '跨境电商'];
-    return !defaultExpandedCategories.includes(group.name);
+    // 没有保存的状态时，所有分类默认展开
+    return false;
   });
 
   // 保存折叠状态到本地存储

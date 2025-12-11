@@ -164,7 +164,7 @@ function App() {
       ...group,
       id: group.id as number,
       sites: (group as any).sites || [],
-      subgroups: []
+      subgroups: (group as any).subgroups || []
     }));
     
     // 将所有分组添加到映射
